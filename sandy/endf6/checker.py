@@ -33,8 +33,8 @@ def check_masses_jeff33(path):
     DfRDD = check_masses([RDD])[0].query("MF==1 & MT==451")#.rename(columns={"AWR": "AWR_RDD"})
     DfN = pd.concat(check_masses(map(lambda x : join(path, x), listdir(path))))
     C = DfN.merge(DfRDD.drop(["MF","MT"], axis=1), how="left", on=["ZAM"], suffixes=("_N","_RDD"))
-    C["RATIO"] = (C.AWR_N/C.AWR_RDD).values
-    C["MATCH"] = np.isclose(C["RATIO"], 1, rtol=1e-6)
+#    C["RATIO"] = (C.AWR_N/C.AWR_RDD).values
+#    C["MATCH"] = np.isclose(C["RATIO"], 1, rtol=1e-6)
     grouped = C[["ZAM","AWR_N"]].set_index("ZAM").groupby("ZAM")
     df = grouped.agg(['count', 'min', 'max', lambda x:x.value_counts().index[0]])
     df.columns = df.columns.droplevel(0)
@@ -50,5 +50,4 @@ def check_masses_jeff33(path):
     df.to_csv("jeff33_masses.csv")
 
 
-#A=get_masses(r"X:\aaa\78-Pt-192g.jeff33")
-check_masses_jeff33(r"X:\aaa")
+#check_masses_jeff33(r"X:\aaa")

@@ -161,8 +161,6 @@ def check_rdd_fy(RDD, FY):
         C['IY'] = ify.values
         C['CY_calc'], res, rank, sing = lstsq((np.identity(len(B)) - B.as_matrix()), C.IY.values)
         C["diff"] = np.abs(C.CY_calc/C.CY-1).values
-        C["Z"] = pd.Series(C.index.values/10000, dtype=int).values
-        C["A"] = pd.Series((C.index.values-C.Z.values*10000)/10, dtype=int).values
         chi2, p_value = chisquare(C.CY.loc[C.CY>0], f_exp=C.CY_calc.loc[C.CY>0])
         print(zap,e,chi2,p_value)
 
@@ -222,5 +220,29 @@ def test_jeff33_rdd_fy():
     check_rdd_fy(join(dirname(realpath(td)), r"RDD.jeff33"),
                  join(dirname(realpath(td)), r"FY.jeff33"))
 
+def bayesian():
+    from sandy.data_test import __file__ as td
+    from sandy.endf6.features import split_zam
+    RDD = join(dirname(realpath(td)), r"RDD.jeff33")
+    FY = join(dirname(realpath(td)), r"FY.jeff33")
+#    B = RDDFile( RDD ).extract_bmatrix(timelimit=1000)
+#    index = B.index.get_level_values("ZA_PARENT")*10 + B.index.get_level_values("LISO_PARENT")
+    IFY, CFY = FYFile( FY ).extract_fy()
+    # Loop fissioning systems
+    for (zap,e), ify in IFY.groupby(["ZAP", "E"]):
+        ify["ZAMFP"] = 10*ify.ZAFP.values + ify.FPS.values
+        ify = ify.merge(split_zam(ify.ZAMFP.values), how="left", left_on="ZAMFP", right_on="ZAM")
+        Zmatrix = pd.crosstab(index=[ify.Z], columns=[ify.ZAM])
+        Amatrix = pd.crosstab(index=[ify.A], columns=[ify.ZAM])
+        dfc = CFY.query("ZAP=={} & E=={}".format(zap,e))
+#        ify = dfi.set_index(dfi.ZAFP*10+dfi.FPS).reindex(index).YI.fillna(0)
+        cfy = dfc.set_index(dfc.ZAFP*10+dfc.FPS).reindex(index).YI.fillna(0)
+        C = cfy.to_frame().rename(columns={'YI' : 'CY'})
+        C['IY'] = ify.values
+        C['CY_calc'], res, rank, sing = lstsq((np.identity(len(B)) - B.as_matrix()), C.IY.values)
+        C["diff"] = np.abs(C.CY_calc/C.CY-1).values
+        chi2, p_value = chisquare(C.CY.loc[C.CY>0], f_exp=C.CY_calc.loc[C.CY>0])
+        print(zap,e,chi2,p_value)
 
-test_jeff33_rdd_fy()
+#test_jeff33_rdd_fy()
+bayesian()

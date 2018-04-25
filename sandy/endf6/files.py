@@ -139,7 +139,6 @@ def endf2df(file, keep_mf=None, keep_mt=None):
     tape['DATA'] = tape['TEXT'].apply(process_endf_section, keep_mf=keep_mf, keep_mt=keep_mt)
     return tape
 
-
 def read_mf1_mt451(text):
     str_list = text.splitlines()
     i = 0
