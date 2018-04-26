@@ -220,21 +220,65 @@ def test_jeff33_rdd_fy():
     check_rdd_fy(join(dirname(realpath(td)), r"RDD.jeff33"),
                  join(dirname(realpath(td)), r"FY.jeff33"))
 
+def gls(x, Cx, G, y, Cy):
+    _x = np.matrix(x.reshape(-1,1)) # column array
+    _Cx = np.matrix(Cx)
+    _G = np.matrix(G) # _y = _G * _x
+    _y = np.matrix(np.array(y).reshape(-1,1)) # column array
+    _Cy = np.matrix(Cy)
+    _V = np.linalg.inv(_G * _Cx * _G.T + _Cy)
+    _K = _Cx * _G.T * _V
+    delta = _y - _G * _x
+    xpost = np.array(_x + _K * delta).reshape(-1)
+    Cpost = np.array(_Cx - _K * _G * _Cx)
+    return xpost, Cpost
+
 def bayesian():
     from sandy.data_test import __file__ as td
     from sandy.endf6.features import split_zam
     RDD = join(dirname(realpath(td)), r"RDD.jeff33")
     FY = join(dirname(realpath(td)), r"FY.jeff33")
-#    B = RDDFile( RDD ).extract_bmatrix(timelimit=1000)
-#    index = B.index.get_level_values("ZA_PARENT")*10 + B.index.get_level_values("LISO_PARENT")
+    Q = RDDFile( RDD ).extract_qmatrix(timelimit=1000)
+    index = Q.index.get_level_values('ZA_PARENT')*10+Q.index.get_level_values('LISO_PARENT')
+    Q.index = Q.columns = pd.Index(index, name="ZAM")
     IFY, CFY = FYFile( FY ).extract_fy()
     # Loop fissioning systems
     for (zap,e), ify in IFY.groupby(["ZAP", "E"]):
-        ify["ZAMFP"] = 10*ify.ZAFP.values + ify.FPS.values
+        ify["ZAMFP"] = pd.Categorical(10*ify.ZAFP.values + ify.FPS.values)
         ify = ify.merge(split_zam(ify.ZAMFP.values), how="left", left_on="ZAMFP", right_on="ZAM")
-        Zmatrix = pd.crosstab(index=[ify.Z], columns=[ify.ZAM])
-        Amatrix = pd.crosstab(index=[ify.A], columns=[ify.ZAM])
-        dfc = CFY.query("ZAP=={} & E=={}".format(zap,e))
+        cfy = CFY.query("ZAP=={} & E=={}".format(zap,e))
+        cfy["ZAMFP"] = pd.Categorical(10*cfy.ZAFP.values + cfy.FPS.values)
+        cfy = cfy.merge(split_zam(cfy.ZAMFP.values), how="left", left_on="ZAMFP", right_on="ZAM")
+
+        I = ify.YI.values
+        P = np.diag(ify.DYI.values)
+
+        Zcoeff = ify.Z
+#        Zmatrix = pd.crosstab(index=[ify.Z], columns=[ify.ZAM])
+#        ChargeYields = Zmatrix.dot(ify.YI.values).rename("YI")
+#        ZCN = Zcoeff.dot(ify.YI)
+        I, P = gls(I, P, Zcoeff.values, 90, 1e-5)
+
+        Acoeff = ify.A
+#        Amatrix = pd.crosstab(index=[ify.A], columns=[ify.ZAM])
+#        MassYields = Amatrix.dot(ify.YI.values).rename("YI")
+#        ACN = Acoeff.dot(ify.YI) # missing nubar
+        ACN = 232 - 2.269
+        I, P = gls(I, P, Acoeff.values, ACN, 0.01)
+
+        Scoeff = pd.Series([1]*len(ify))
+#        Sum = Scoeff.dot(ify.YI)
+        I, P = gls(I, P, Scoeff.values, 2, 1e-5)
+
+        SYcoeff = Scoeff.mask(Acoeff < (ACN)/2., 0)
+#        Symmetry = SYcoeff.dot(ify.YI) # missing nubar
+        I, P = gls(I, P, SYcoeff.values, 1, 1e-5)
+
+        Qcoeff = Qmatrix = Q.reindex(index=cfy.ZAM).reindex(columns=ify.ZAM)
+#        CumYields = Qmatrix.dot(ify.YI.values).rename("YI")
+#        CumYields.mask("YI" < 0, inplace=True)
+        I, P = gls(I, P, Qcoeff.as_matrix(), cfy.YI.values, np.diag(cfy.DYI.values))
+
 #        ify = dfi.set_index(dfi.ZAFP*10+dfi.FPS).reindex(index).YI.fillna(0)
         cfy = dfc.set_index(dfc.ZAFP*10+dfc.FPS).reindex(index).YI.fillna(0)
         C = cfy.to_frame().rename(columns={'YI' : 'CY'})
