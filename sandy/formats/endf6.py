@@ -354,10 +354,22 @@ def read_mf2_mt151(text):
                     C, i = read_cont(str_list, i)
                     sub.update({"SPI" : C.C1, "SR" : C.C2, "NLS" : C.N1})
                     L, i = read_list(str_list, i)
+                    sub.update({"AWRI" : L.C1, "QX" : L.C2, "L" : L.L1, "LRX" : L.L2})
+                    resparms = {}
+                    for x in np.array(L.B).reshape(-1,6):
+                        y = dict(zip(["ER", "AJ", "GT", "GN", "GG", "GF"], x))
+                        resparms.update({ (y["ER"], y["AJ"]) : y })
+                    sub.update({"PARMS" : resparms})
                 elif sub["LRF"] == 3: # REICH-MOORE
                     C, i = read_cont(str_list, i)
                     sub.update({"SPI" : C.C1, "SR" : C.C2, "LAD" : C.L1, "NLS" : C.N1, "NLSC" : C.N2})
                     L, i = read_list(str_list, i)
+                    sub.update({"AWRI" : L.C1, "APL" : L.C2, "L" : L.L1})
+                    resparms = {}
+                    for x in np.array(L.B).reshape(-1,6):
+                        y = dict(zip(["ER", "AJ", "GN", "GG", "GFA", "GFB"], x))
+                        resparms.update({ (y["ER"], y["AJ"]) : y })
+                    sub.update({"PARMS" : resparms})
                 elif sub["LRF"] == 4: # ADLER-ADLER
                     sys.exit("ERROR: SANDY cannot read resonance parameters in Adler-Adler formalism")
                 elif sub["LRF"] == 5: # GENERAL R-MATRIX
@@ -754,6 +766,41 @@ def pandas_interpolate(df, interp_column, method='zero', axis='both'):
     dfout.fillna(0, inplace=True)
     return dfout
 
+
+class ResPar(pd.DataFrame):
+    
+    @classmethod
+    def from_tape(cls, tape, zai, erange):
+        for chunk in tape.query("MF==2 & MT==151").DATA:
+            if not chunk:
+                continue
+            if zai not in chunk["ZAI"]:
+                continue
+            if erange not in chunk["ZAI"][zai]["ERANGE"]:
+                continue
+            sub = chunk["ZAI"][zai]["ERANGE"][erange]
+            if sub["LRU"] != 1:
+                continue
+            if sub["LRF"] in (1,2): # BREIT-WIGNER
+                columns = ["ER", "AJ", "GT", "GN", "GG", "GF"]
+                L = [[v[x] for x in columns] for k,v in sorted(sub["PARMS"].items())]
+                frame = pd.DataFrame.from_records(L, columns=columns)
+                if sub["LRX"] == 1:
+                    frame["LRX"] = frame.GT.values - frame.GN.values - frame.GG.values - frame.GF.values
+                return cls(frame)
+            elif sub["LRF"] == 3: # REICH-MOORE
+                columns = ["ER", "AJ", "GN", "GG", "GFA", "GFB"]
+                L = [[v[x] for x in columns] for k,v in sorted(sub["PARMS"].items())]
+                frame = pd.DataFrame.from_records(L, columns=columns)
+                return cls(frame)
+        return cls()
+    
+    def reconstruct_total(self):
+        from functools import reduce
+        frame = self.copy()
+        keys = ["GN", "GG", "GF", "GFA", "GFB", "GX"]
+        frame["GT"] = reduce(lambda x, y: x+y, [frame[k].values for k in keys if k in frame.columns])
+        return ResPar(frame)
 
 
 class Xs(pd.DataFrame):

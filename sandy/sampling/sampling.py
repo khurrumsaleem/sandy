@@ -227,6 +227,8 @@ def run():
     global tape
     tape = e6.Endf6.from_file(settings.args.file).process()
     covtape = e6.Endf6.from_file(settings.args.covfile).process() #, keep_mf=[3], keep_mt=[102])
+    A=e6.ResPar.from_tape(tape, 96242, (1e-5,275))
+    B=A.reconstruct_total()
 #    if settings.args.keep_mat:
 #        query = "|".join([ "MAT=={}".format(x) for x in settings.args.keep_mat])
 #        tape = tape.query(query)
