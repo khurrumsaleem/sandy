@@ -109,7 +109,7 @@ def test_Cm242():
     td = dirname(realpath(td))
     extra_args = [join(td, r"cm242.endf"),
                  "--covfile", join(td, r"cm242.endf"),
-                 "--outdir", r"cm242-tmpdir",
+                 "--outdir", r"cm242-tmpdir2",
 #                 "--njoy", join(sd, r"njoy2012_50.exe"),
                  "--eig", "10",
                  "--samples", "10",

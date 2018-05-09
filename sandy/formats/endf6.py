@@ -126,6 +126,8 @@ def process_endf_section(text, keep_mf=None, keep_mt=None):
         return read_mf8_mt457(text)
     elif mf == 31 or mf == 33:
         return read_mf33_mt(text)
+    elif mf == 32:
+        return read_mf32_mt151(text)
 #    elif mf == 35:
 #        return read_mf35_mt(text)
     else:
@@ -141,7 +143,7 @@ def endf2df(file, keep_mf=None, keep_mt=None):
 
 
 class Endf6(pd.DataFrame):
-    
+
     @classmethod
     def from_file(cls, file, by='MAT'):
         """
@@ -174,10 +176,10 @@ class Endf6(pd.DataFrame):
             return cls(frame)
         else:
             raise NotImplementedError("wrong argument 'by'")
-    
+
     def process(self, keep_mf=None, keep_mt=None):
         """
-        Parse TEXT column. 
+        Parse TEXT column.
         """
         tape = self.copy()
         tape['DATA'] = tape['TEXT'].apply(process_endf_section, keep_mf=keep_mf, keep_mt=keep_mt)
@@ -185,7 +187,7 @@ class Endf6(pd.DataFrame):
 
     def to_string(self, title=" "*66):
         """
-        Write TEXT column to string. 
+        Write TEXT column to string.
         """
         tape = pd.DataFrame(index=self.index.copy(), columns=self.columns.copy())
         for k,row in self.iterrows():
@@ -202,10 +204,10 @@ class Endf6(pd.DataFrame):
             string += "{:<66}{:4}{:2}{:3}{:5}\n".format(*write_cont(*[0]*6), 0, 0, 0, 0)
         string += "{:<66}{:4}{:2}{:3}{:5}".format(*write_cont(*[0]*6), -1, 0, 0, 0)
         return string
-    
+
     def to_file(self, file, title=" "*66):
         """
-        Write TEXT column to file. 
+        Write TEXT column to file.
         """
         string = self.to_string(title=title)
         with open(file, 'w', encoding="ascii") as f:
@@ -354,22 +356,16 @@ def read_mf2_mt151(text):
                     C, i = read_cont(str_list, i)
                     sub.update({"SPI" : C.C1, "SR" : C.C2, "NLS" : C.N1})
                     L, i = read_list(str_list, i)
-                    sub.update({"AWRI" : L.C1, "QX" : L.C2, "L" : L.L1, "LRX" : L.L2})
-                    resparms = {}
-                    for x in np.array(L.B).reshape(-1,6):
-                        y = dict(zip(["ER", "AJ", "GT", "GN", "GG", "GF"], x))
-                        resparms.update({ (y["ER"], y["AJ"]) : y })
-                    sub.update({"PARMS" : resparms})
+                    sub.update({"AWRI" : L.C1, "QX" : L.C2, "L" : L.L1, "LRX" : L.L2, "PARMS" : L.B})
+#                    resparms = {}
+#                    for x in np.array(L.B).reshape(-1,6):
+#                        y = dict(zip(["ER", "AJ", "GT", "GN", "GG", "GF"], x))
+#                        resparms.update({ (y["ER"], y["AJ"]) : y })
                 elif sub["LRF"] == 3: # REICH-MOORE
                     C, i = read_cont(str_list, i)
                     sub.update({"SPI" : C.C1, "SR" : C.C2, "LAD" : C.L1, "NLS" : C.N1, "NLSC" : C.N2})
                     L, i = read_list(str_list, i)
-                    sub.update({"AWRI" : L.C1, "APL" : L.C2, "L" : L.L1})
-                    resparms = {}
-                    for x in np.array(L.B).reshape(-1,6):
-                        y = dict(zip(["ER", "AJ", "GN", "GG", "GFA", "GFB"], x))
-                        resparms.update({ (y["ER"], y["AJ"]) : y })
-                    sub.update({"PARMS" : resparms})
+                    sub.update({"AWRI" : L.C1, "APL" : L.C2, "L" : L.L1, "PARMS" : L.B})
                 elif sub["LRF"] == 4: # ADLER-ADLER
                     sys.exit("ERROR: SANDY cannot read resonance parameters in Adler-Adler formalism")
                 elif sub["LRF"] == 5: # GENERAL R-MATRIX
@@ -601,6 +597,69 @@ def read_mf8_fy(text):
             out["E"][L.C1].update({ "I" : L.L1 })
     return out
 
+def read_mf32_mt151(text):
+    str_list = text.splitlines()
+    i = 0
+    out = {"MAT" : int(str_list[i][66:70]),
+           "MF" : int(str_list[i][70:72]),
+           "MT" : int(str_list[i][72:75])}
+    C, i = read_cont(str_list, i)
+    out.update({ "ZA" : C.C1, "AWR" : C.C2, "NIS" : C.N1, "ZAI" : {} })
+    for i_iso in range(out["NIS"]): # LOOP ISOTOPES
+        C, i = read_cont(str_list, i)
+        zai = { "ZAI" : C.C1, "ABN" : C.C2, "LFW" : C.L2, "NER" : C.N1, "ERANGE" : {} }
+        for i_erange in range(zai["NER"]): # LOOP ENERGY RANGES
+            C, i = read_cont(str_list, i)
+            sub = {"EL" : C.C1, "EH" : C.C2, "LRU" : C.L1, "LRF" : C.L2, "NRO" : C.N1, "NAPS" : C.N2}
+            if sub["NRO"] != 0: # Tabulated scattering radius
+                raise NotImplementedError("MF==32 & NRO!=0 not implemented")
+                T, i = read_tab1(str_list, i)
+                sub.update({"NBT" : T.NBT, "INT" : T.INT})
+                sub["AP"] = pd.Series(T.y, index = T.x).rename_axis("E")
+            if sub["LRU"] == 0: # ONLY SCATTERING RADIUS
+                C, i = read_cont(str_list, i)
+                sub.update({"SPI" : C.C1, "SR" : C.C2, "LCOMP" : C.L2, "NLS" : C.N1})
+            if sub["LRU"] == 1: # RESOLVED RESONANCES
+                if sub["LRF"] in (1,2): # BREIT-WIGNER
+                    C, i = read_cont(str_list, i)
+                    sub.update({"SPI" : C.C1, "SR" : C.C2, "LCOMP" : C.L2, "NLS" : C.N1, "ISR" : C.N2})
+                    if sub["ISR"] != 0:
+                        C, i = read_cont(str_list, i)
+                        sub.update({"DAP" : C.C2})
+                    if sub["LCOMP"] == 0:
+                        for inls in range(sub["NLS"]):
+                            L, i = read_list(str_list, i)
+                    elif sub["LCOMP"] == 1:
+                        C, i = read_cont(str_list, i)
+                        sub.update({"AWRI" : C.C1, "NSRS" : C.N1, "NLRS" : C.N2})
+                        for insrs in range(sub["NSRS"]):
+                            L, i = read_list(str_list, i)
+                        sub.update({"MPAR" : L.L1, "NRB" : L.N2, "PARMS" : L.B[:L.N2*6], "V" : L.B[L.N2*6:]})
+                        sub.update({"NVS" : int(L.N2*L.L1*(L.N2*L.L1+1)/2)})
+                elif sub["LRF"] == 3: # REICH-MOORE
+                    C, i = read_cont(str_list, i)
+                    sub.update({"SPI" : C.C1, "SR" : C.C2, "LCOMP" : C.L2, "NLS" : C.N1, "ISR" : C.N2})
+                    if sub["ISR"] != 0:
+                        L, i = read_list(str_list, i)
+                    if sub["LCOMP"] == 1:
+                        C, i = read_cont(str_list, i)
+                        sub.update({"AWRI" : C.C1, "NSRS" : C.N1, "NLRS" : C.N2})
+                        for insrs in range(sub["NSRS"]):
+                            L, i = read_list(str_list, i)
+                        sub.update({"MPAR" : L.L1, "NRB" : L.N2, "PARMS" : L.B[:L.N2*6], "V" : L.B[L.N2*6:]})
+                        sub.update({"NVS" : int(L.N2*L.L1*(L.N2*L.L1+1)/2)})
+                elif sub["LRF"] == 4: # ADLER-ADLER
+                    sys.exit("ERROR: SANDY cannot read resonance parameters in Adler-Adler formalism")
+                elif sub["LRF"] == 5: # GENERAL R-MATRIX
+                    sys.exit("ERROR: General R-matrix formalism no longer available in ENDF-6")
+                elif sub["LRF"] == 6: # HYBRID R-FUNCTION
+                    sys.exit("ERROR: Hybrid R-function formalism no longer available in ENDF-6")
+                elif sub["LRF"] == 7: # LIMITED R-MATRIX
+                    sys.exit("ERROR: SANDY cannot read resonance parameters in limited R-matrix formalism")
+            zai["ERANGE"].update({ (sub["EL"],sub["EH"]) : sub })
+        out["ZAI"].update({ zai["ZAI"] : zai })
+    return out
+
 def read_mf33_mt(text):
     str_list = text.splitlines()
     i = 0
@@ -768,9 +827,9 @@ def pandas_interpolate(df, interp_column, method='zero', axis='both'):
 
 
 class ResPar(pd.DataFrame):
-    
+
     @classmethod
-    def from_tape(cls, tape, zai, erange):
+    def from_tape(cls, tape, zai, erange, mf=2):
         for chunk in tape.query("MF==2 & MT==151").DATA:
             if not chunk:
                 continue
@@ -782,25 +841,50 @@ class ResPar(pd.DataFrame):
             if sub["LRU"] != 1:
                 continue
             if sub["LRF"] in (1,2): # BREIT-WIGNER
-                columns = ["ER", "AJ", "GT", "GN", "GG", "GF"]
-                L = [[v[x] for x in columns] for k,v in sorted(sub["PARMS"].items())]
-                frame = pd.DataFrame.from_records(L, columns=columns)
+                frame = pd.DataFrame(np.array(sub["PARMS"]).reshape(-1, 6), columns = ["ER", "AJ", "GT", "GN", "GG", "GF"])
                 if sub["LRX"] == 1:
                     frame["LRX"] = frame.GT.values - frame.GN.values - frame.GG.values - frame.GF.values
                 return cls(frame)
             elif sub["LRF"] == 3: # REICH-MOORE
-                columns = ["ER", "AJ", "GN", "GG", "GFA", "GFB"]
-                L = [[v[x] for x in columns] for k,v in sorted(sub["PARMS"].items())]
-                frame = pd.DataFrame.from_records(L, columns=columns)
+                frame = pd.DataFrame(np.array(sub["PARMS"]).reshape(-1, 6), columns = ["ER", "AJ", "GN", "GG", "GFA", "GFB"])
                 return cls(frame)
         return cls()
-    
+
     def reconstruct_total(self):
         from functools import reduce
         frame = self.copy()
         keys = ["GN", "GG", "GF", "GFA", "GFB", "GX"]
         frame["GT"] = reduce(lambda x, y: x+y, [frame[k].values for k in keys if k in frame.columns])
         return ResPar(frame)
+
+
+
+class ResParCov(pd.DataFrame):
+
+    @classmethod
+    def from_tape(cls, tape):
+        for chunk in tape.query("MF==32 & MT==151").DATA:
+            if not chunk:
+                continue
+            for zai in chunk["ZAI"]:
+                for erange in chunk["ZAI"][zai]["ERANGE"]:
+                    sub = chunk["ZAI"][zai]["ERANGE"][erange]
+                    if sub["LRU"] != 1:
+                        continue
+                    if sub["LRF"] in (1,2): # BREIT-WIGNER
+                        if sub["LCOMP"] == 1:
+                            keep = ["ER", "GN", "GG", "GF", "GX"]
+                            respar = ResPar.from_tape(tape, zai, erange, mf=32)[keep[:sub["MPAR"]]]
+#                            sub["V"] = 1
+
+                        frame = pd.DataFrame(np.array(sub["PARMS"]).reshape(-1, 6), columns = ["ER", "AJ", "GT", "GN", "GG", "GF"])
+                        if sub["LRX"] == 1:
+                            frame["LRX"] = frame.GT.values - frame.GN.values - frame.GG.values - frame.GF.values
+                        return cls(frame)
+                    elif sub["LRF"] == 3: # REICH-MOORE
+                        frame = pd.DataFrame(np.array(sub["PARMS"]).reshape(-1, 6), columns = ["ER", "AJ", "GN", "GG", "GFA", "GFB"])
+                        return cls(frame)
+                return cls()
 
 
 class Xs(pd.DataFrame):

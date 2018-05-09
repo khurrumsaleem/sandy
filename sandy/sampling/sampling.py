@@ -213,7 +213,7 @@ def sampling2(ismp, PertSeriesXs, **kwargs):
     tapeout = e6.Xs.from_tape(tape).perturb(PertSeriesXs).update_tape(tape)
     tapeout = e6.write_mf1_nubar(tapeout)
     tapeout = e6.write_mf3_mt(tapeout)
-    
+
     output = os.path.join(kwargs["outdir"], os.path.basename(kwargs["file"]) + '-{}'.format(ismp))
     string = e6.Endf6(tapeout).to_file(output)
     print("Created file '{}' in {:.2f} sec".format(output, time.time()-t0,))
@@ -227,7 +227,8 @@ def run():
     global tape
     tape = e6.Endf6.from_file(settings.args.file).process()
     covtape = e6.Endf6.from_file(settings.args.covfile).process() #, keep_mf=[3], keep_mt=[102])
-    A=e6.ResPar.from_tape(tape, 96242, (1e-5,275))
+    A=e6.ResParCov.from_tape(tape)
+    A=e6.ResPar.from_tape(tape, 96242, (1e-5,275), mf=32)
     B=A.reconstruct_total()
 #    if settings.args.keep_mat:
 #        query = "|".join([ "MAT=={}".format(x) for x in settings.args.keep_mat])
