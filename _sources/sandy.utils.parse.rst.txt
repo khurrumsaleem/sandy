@@ -1,0 +1,7 @@
+sandy.utils.parse module
+========================
+
+.. automodule:: sandy.utils.parse
+    :members:
+    :undoc-members:
+    :show-inheritance:

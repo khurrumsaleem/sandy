@@ -1,0 +1,527 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sandy.functions module &mdash; SANDY API 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sandy.sampling module" href="sandy.sampling.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SANDY API
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="sandy.html">sandy package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sandy.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="sandy.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sandy.decay.html">sandy.decay module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sandy.functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sandy.sampling.html">sandy.sampling module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sandy.settings.html">sandy.settings module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SANDY API</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="sandy.html">sandy package</a> &raquo;</li>
+        
+      <li>sandy.functions module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sandy.functions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sandy.functions">
+<span id="sandy-functions-module"></span><h1>sandy.functions module<a class="headerlink" href="#module-sandy.functions" title="Permalink to this headline">¶</a></h1>
+<p>Created on Thu Jan 12 11:10:49 2017</p>
+<p>&#64;author: lfiorito</p>
+<dl class="function">
+<dt id="sandy.functions.contains">
+<code class="descclassname">sandy.functions.</code><code class="descname">contains</code><span class="sig-paren">(</span><em>item</em>, <em>xmin</em>, <em>xmax</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if item is included in a given domain.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>item :</dt>
+<dd>(scalar or iterable) x-value(s) to check</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>xmin :</dt>
+<dd>(scalar) lower bound of the domain</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>xmax :</dt>
+<dd>(scalar) upper bound of the domain</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Outputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>mask:</dt>
+<dd>(boolean array/scalar) True if item is included, otherwise False</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.convert_za">
+<code class="descclassname">sandy.functions.</code><code class="descname">convert_za</code><span class="sig-paren">(</span><em>za</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.convert_za" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.div0">
+<code class="descclassname">sandy.functions.</code><code class="descname">div0</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>value=0</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.div0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ignore division by zero.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>a :</dt>
+<dd>(array or scalar) numerator</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>b :</dt>
+<dd>(array or scalar) denominator</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>value :</dt>
+<dd>(scalar) standard replacer when division by zero is found (default is zero)</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Outputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>c :</dt>
+<dd>(array or scalar) a/b</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>..Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">div0</span><span class="p">(</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">0</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.find_nearest">
+<code class="descclassname">sandy.functions.</code><code class="descname">find_nearest</code><span class="sig-paren">(</span><em>my_array</em>, <em>my_value</em>, <em>opt='below'</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.find_nearest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the nearest value in an array.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.force_symlink">
+<code class="descclassname">sandy.functions.</code><code class="descname">force_symlink</code><span class="sig-paren">(</span><em>file1</em>, <em>file2</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.force_symlink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.gls">
+<code class="descclassname">sandy.functions.</code><code class="descname">gls</code><span class="sig-paren">(</span><em>x</em>, <em>Cx</em>, <em>G</em>, <em>y</em>, <em>Cy</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.gls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run GLS adjustment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.isnum">
+<code class="descclassname">sandy.functions.</code><code class="descname">isnum</code><span class="sig-paren">(</span><em>item</em>, <em>rais=True</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.isnum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if input <em>item</em> is a scalar number, otherwise false.
+Raise error if input <em>rais</em> is true.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.log10">
+<code class="descclassname">sandy.functions.</code><code class="descname">log10</code><span class="sig-paren">(</span><em>x</em>, <em>value=0</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.log10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ignore division by zero.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>a :</dt>
+<dd>numerator</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>b :</dt>
+<dd>denominator</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>value :</dt>
+<dd>standard replacer when division by zero is found</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Outputs:</dt>
+<dd><ul class="first last simple">
+<li>c: a/b</li>
+</ul>
+</dd>
+</dl>
+<p>..Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">div0</span><span class="p">(</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">0</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.printProgress">
+<code class="descclassname">sandy.functions.</code><code class="descname">printProgress</code><span class="sig-paren">(</span><em>iteration</em>, <em>total</em>, <em>prefix=''</em>, <em>suffix=''</em>, <em>decimals=1</em>, <em>barLength=100</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.printProgress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call in a loop to create terminal progress bar
+&#64;params:</p>
+<blockquote>
+<div>iteration   - Required  : current iteration (Int)
+total       - Required  : total iterations (Int)
+prefix      - Optional  : prefix string (Str)
+suffix      - Optional  : suffix string (Str)
+decimals    - Optional  : positive number of decimals in percent complete (Int)
+barLength   - Optional  : character length of bar (Int)</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.run_process">
+<code class="descclassname">sandy.functions.</code><code class="descname">run_process</code><span class="sig-paren">(</span><em>cmd</em>, <em>cwd=None</em>, <em>timeout=36000</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.run_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.split_by_n">
+<code class="descclassname">sandy.functions.</code><code class="descname">split_by_n</code><span class="sig-paren">(</span><em>seq</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.split_by_n" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.union_grid">
+<code class="descclassname">sandy.functions.</code><code class="descname">union_grid</code><span class="sig-paren">(</span><em>*xgrids</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.union_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return union grid from a list of grids.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><ul class="first last simple">
+<li><table class="first docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name"><code class="docutils literal notranslate"><span class="pre">xgrids</span></code>:</th><td class="field-body">:
+(list) input grids</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</dd>
+<dt>Outputs:</dt>
+<dd><ul class="first last simple">
+<li><table class="first docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name"><code class="docutils literal notranslate"><span class="pre">ug</span></code>:</th><td class="field-body">:
+(<code class="docutils literal notranslate"><span class="pre">records.Grid</span></code> instance) sorted union grid in 1D-array</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.zero_interp">
+<code class="descclassname">sandy.functions.</code><code class="descname">zero_interp</code><span class="sig-paren">(</span><em>xx_old</em>, <em>arr</em>, <em>xx_new</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.zero_interp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reshape array on its first dimension by using zero interpolation.
+If some x-values of the new grid exceed the bounds of the old grid, set
+the corresponing interpolated array to zero in those positions.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>xx_old :</dt>
+<dd>old array of tabulated x-values.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>xx_new :</dt>
+<dd>new array of tabulated x-values.</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Outputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>arr_new :</dt>
+<dd>array reshaped according to xx_new.</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.zero_interp_1d">
+<code class="descclassname">sandy.functions.</code><code class="descname">zero_interp_1d</code><span class="sig-paren">(</span><em>xx_old</em>, <em>arr</em>, <em>xx_new</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.zero_interp_1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reshape array on its first dimension by using zero interpolation.
+If some x-values of the new grid exceed the bounds of the old grid, set
+the corresponing interpolated array to zero in those positions.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>xx_old :</dt>
+<dd>old array of tabulated x-values.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>xx_new :</dt>
+<dd>new array of tabulated x-values.</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Outputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>arr_new :</dt>
+<dd>array reshaped according to xx_new.</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandy.functions.zero_interp_2d">
+<code class="descclassname">sandy.functions.</code><code class="descname">zero_interp_2d</code><span class="sig-paren">(</span><em>xx_old</em>, <em>arr</em>, <em>xx_new</em><span class="sig-paren">)</span><a class="headerlink" href="#sandy.functions.zero_interp_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reshape array on its first dimension by using zero interpolation.
+If some x-values of the new grid exceed the bounds of the old grid, set
+the corresponing interpolated array to zero in those positions.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>xx_old :</dt>
+<dd>old array of tabulated x-values.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>xx_new :</dt>
+<dd>new array of tabulated x-values.</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Outputs:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>arr_new :</dt>
+<dd>array reshaped according to xx_new.</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sandy.sampling.html" class="btn btn-neutral float-right" title="sandy.sampling module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Luca Fiorito
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

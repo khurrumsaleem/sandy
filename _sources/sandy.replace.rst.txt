@@ -1,0 +1,15 @@
+sandy.replace package
+=====================
+
+.. automodule:: sandy.replace
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+
+   sandy.replace.replace
+

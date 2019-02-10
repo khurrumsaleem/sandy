@@ -1,0 +1,15 @@
+sandy.integrals package
+=======================
+
+.. automodule:: sandy.integrals
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+
+   sandy.integrals.macs
+
